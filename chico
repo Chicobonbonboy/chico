@@ -1,0 +1,81 @@
+import pygame
+import sys
+
+# Initialize pygame
+pygame.init()
+
+# Set up screen dimensions
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+CELL_SIZE = 50
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+
+# Player properties
+player_pos = [0, SCREEN_HEIGHT - CELL_SIZE * 2]
+player_velocity = [0, 0]
+player_acceleration = 0.5
+player_jump_strength = -10
+player_on_ground = False
+
+# Set up the screen
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Super Mario Brothers")
+
+clock = pygame.time.Clock()
+
+def draw_player():
+    pygame.draw.rect(screen, RED, (player_pos[0], player_pos[1], CELL_SIZE, CELL_SIZE))
+
+def update_player():
+    player_pos[0] += player_velocity[0]
+    player_pos[1] += player_velocity[1]
+
+    # Gravity
+    if not player_on_ground:
+        player_velocity[1] += player_acceleration
+
+    # Collide with ground
+    if player_pos[1] >= SCREEN_HEIGHT - CELL_SIZE * 2:
+        player_pos[1] = SCREEN_HEIGHT - CELL_SIZE * 2
+        player_velocity[1] = 0
+        player_on_ground = True
+    else:
+        player_on_ground = False
+
+def handle_events():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RIGHT:
+                player_velocity[0] = 5
+            if event.key == pygame.K_SPACE and player_on_ground:
+                player_velocity[1] = player_jump_strength
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_RIGHT:
+                player_velocity[0] = 0
+
+def main():
+    while True:
+        handle_events()
+        update_player()
+
+        # Fill the screen with white
+        screen.fill(WHITE)
+
+        # Draw player
+        draw_player()
+
+        # Update the display
+        pygame.display.update()
+
+        # Cap the frame rate
+        clock.tick(60)
+
+if __name__ == "__main__":
+    main()
